@@ -1,0 +1,68 @@
+<Application
+    x:Class="FendrSystemCare.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vm="clr-namespace:FendrSystemCare.ViewModels"
+    xmlns:views="clr-namespace:FendrSystemCare.Views"
+    xmlns:conv="clr-namespace:FendrSystemCare.Utilities">
+
+    <!--
+        Application-level resources.
+        We compose the WPF-UI Fluent theme (Mica/Acrylic capable) with our own
+        colour/style dictionaries and the ViewModel-first DataTemplates that
+        drive navigation (a ViewModel is rendered by its matching Page).
+    -->
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
+                <ResourceDictionary Source="pack://application:,,,/Themes/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Themes/Styles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Themes/Animations.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Shared value converters. -->
+            <conv:BytesToStringConverter x:Key="BytesToString" />
+            <conv:InverseBooleanConverter x:Key="InverseBool" />
+            <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+            <conv:StatusToBrushConverter x:Key="StatusToBrush" />
+            <conv:ImpactToBrushConverter x:Key="ImpactToBrush" />
+            <conv:HealthLevelToBrushConverter x:Key="HealthLevelToBrush" />
+            <conv:LogLevelToBrushConverter x:Key="LogLevelToBrush" />
+
+            <!-- ViewModel -> View mapping used by the main ContentControl. -->
+            <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+                <views:DashboardPage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:DriverCenterViewModel}">
+                <views:DriverCenterPage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SystemRepairViewModel}">
+                <views:SystemRepairPage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:CleanupViewModel}">
+                <views:CleanupPage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:PerformanceViewModel}">
+                <views:PerformancePage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:StartupViewModel}">
+                <views:StartupPage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:WindowsUpdateViewModel}">
+                <views:WindowsUpdatePage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:ToolsViewModel}">
+                <views:ToolsPage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+                <views:SettingsPage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:AboutViewModel}">
+                <views:AboutPage />
+            </DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,224 @@
+<UserControl
+    x:Class="FendrSystemCare.Views.DriverCenterPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vm="clr-namespace:FendrSystemCare.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:DriverCenterViewModel}"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Style="{StaticResource FadeInUp}" Margin="4,8,16,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Başlık -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock Text="Sürücü Merkezi" Style="{StaticResource PageTitle}" />
+                <TextBlock Text="Gerçek WMI donanım taraması — otomatik indirme yok; resmi Windows araçları kullanılır."
+                           Style="{StaticResource PageSubtitle}" />
+            </StackPanel>
+            <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
+                <ui:Button Content="Tara" Icon="{ui:SymbolIcon ArrowSync24}" Appearance="Primary"
+                           Command="{Binding FullScanCommand}" Margin="0,0,6,6" />
+                <ui:Button Content="İptal" Icon="{ui:SymbolIcon Dismiss24}"
+                           Command="{Binding CancelScanCommand}"
+                           Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}"
+                           Margin="0,0,6,6" />
+                <ui:Button Content="Güncelle" Icon="{ui:SymbolIcon ArrowDownload24}" Appearance="Secondary"
+                           Command="{Binding UpdateDriverCommand}" Margin="0,0,6,6" />
+                <ui:Button Content="WU Tara" Icon="{ui:SymbolIcon ArrowClockwise24}"
+                           Command="{Binding ScanWindowsUpdatesCommand}" Margin="0,0,6,6"
+                           ToolTip="Windows Update üzerinde sürücü güncellemesi ara" />
+                <ui:Button Content="Yedekle" Icon="{ui:SymbolIcon Save24}"
+                           Command="{Binding BackupAllCommand}" Margin="0,0,6,6" />
+                <ui:Button Content="Geri Yükle" Icon="{ui:SymbolIcon ArrowUndo24}"
+                           Command="{Binding RestoreCommand}" Margin="0,0,6,6" />
+                <ui:Button Content="Aygıt Yöneticisi" Icon="{ui:SymbolIcon DeveloperBoard24}"
+                           Command="{Binding OpenDeviceManagerCommand}" Margin="0,0,6,6" />
+                <ui:Button Content="CSV" Icon="{ui:SymbolIcon Document24}"
+                           Command="{Binding ExportReportCommand}" CommandParameter="csv" Margin="0,0,6,6" />
+            </WrapPanel>
+        </Grid>
+
+        <!-- Özet kartları -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" Margin="0,0,0,12">
+            <StackPanel Orientation="Horizontal">
+                <Border Style="{StaticResource HoverCard}" Width="130" Margin="0,0,10,0" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="Sağlık" Style="{StaticResource MetricLabel}" />
+                        <TextBlock Text="{Binding Stats.HealthScore, StringFormat={}{0}/100}" Style="{StaticResource MetricValue}" />
+                        <TextBlock Text="{Binding Stats.HealthRating}" Style="{StaticResource MetricCaption}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Width="110" Margin="0,0,10,0" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="Kurulu" Style="{StaticResource MetricLabel}" />
+                        <TextBlock Text="{Binding Stats.InstalledCount}" Style="{StaticResource MetricValue}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Width="110" Margin="0,0,10,0" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="Eksik" Style="{StaticResource MetricLabel}" />
+                        <TextBlock Text="{Binding Stats.MissingCount}" Foreground="{StaticResource DangerBrush}" Style="{StaticResource MetricValue}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Width="110" Margin="0,0,10,0" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="Güncel Değil" Style="{StaticResource MetricLabel}" />
+                        <TextBlock Text="{Binding Stats.OutdatedCount}" Foreground="{StaticResource WarningBrush}" Style="{StaticResource MetricValue}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Width="110" Margin="0,0,10,0" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="İmzasız" Style="{StaticResource MetricLabel}" />
+                        <TextBlock Text="{Binding Stats.UnsignedCount}" Style="{StaticResource MetricValue}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Width="110" Margin="0,0,10,0" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="Sorunlu" Style="{StaticResource MetricLabel}" />
+                        <TextBlock Text="{Binding Stats.ProblemCount}" Style="{StaticResource MetricValue}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Width="110" Margin="0,0,10,0" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="Cihaz" Style="{StaticResource MetricLabel}" />
+                        <TextBlock Text="{Binding DeviceCount}" Style="{StaticResource MetricValue}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Width="140" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="Son Tarama" Style="{StaticResource MetricLabel}" />
+                        <TextBlock Text="{Binding Stats.LastScan, StringFormat=dd.MM HH:mm, FallbackValue=-}" Style="{StaticResource MetricCaption}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Arama + filtreler -->
+        <Grid Grid.Row="2" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ui:TextBox Grid.Column="0" Icon="{ui:SymbolIcon Search24}"
+                        PlaceholderText="Cihaz, üretici, sürüm, donanım kimliği ara..."
+                        Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,12,0" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <ui:Button Content="Tümü" Padding="10,6" Margin="0,0,4,0"
+                           Command="{Binding SetFilterCommand}" CommandParameter="All" />
+                <ui:Button Content="Sorun" Padding="10,6" Margin="0,0,4,0"
+                           Command="{Binding SetFilterCommand}" CommandParameter="Problem" />
+                <ui:Button Content="Eksik" Padding="10,6" Margin="0,0,4,0"
+                           Command="{Binding SetFilterCommand}" CommandParameter="Missing" />
+                <ui:Button Content="İmzasız" Padding="10,6" Margin="0,0,4,0"
+                           Command="{Binding SetFilterCommand}" CommandParameter="Unsigned" />
+                <ui:Button Content="Devre Dışı" Padding="10,6" Margin="0,0,4,0"
+                           Command="{Binding SetFilterCommand}" CommandParameter="Disabled" />
+                <ui:Button Content="Bilinmeyen" Padding="10,6"
+                           Command="{Binding SetFilterCommand}" CommandParameter="Unknown" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Ana içerik: liste + detay -->
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource Card}" Padding="4" Margin="0,0,12,0">
+                <DataGrid ItemsSource="{Binding DeviceView}" SelectedItem="{Binding SelectedDevice}"
+                          AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal" CanUserSortColumns="True"
+                          CanUserResizeColumns="True" CanUserReorderColumns="True"
+                          Background="Transparent" BorderThickness="0" RowHeight="38"
+                          MouseDoubleClick="OnDeviceDoubleClick">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Cihaz" Binding="{Binding DeviceName}" Width="2*" SortDirection="Ascending" />
+                        <DataGridTextColumn Header="Kategori" Binding="{Binding Category}" Width="*" />
+                        <DataGridTextColumn Header="Sürüm" Binding="{Binding DriverVersion}" Width="90" />
+                        <DataGridTextColumn Header="Sağlayıcı" Binding="{Binding Provider}" Width="*" />
+                        <DataGridTextColumn Header="İmza" Binding="{Binding SignatureStatus}" Width="70" />
+                        <DataGridTextColumn Header="Durum" Binding="{Binding DeviceState}" Width="80" />
+                        <DataGridTextColumn Header="Sorun" Binding="{Binding ProblemText}" Width="*" />
+                    </DataGrid.Columns>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                            <MenuItem Header="Detayları Göster" Command="{Binding ShowDeviceDetailsCommand}" />
+                            <MenuItem Header="Güncelle (Windows)" Command="{Binding UpdateDriverCommand}" />
+                            <MenuItem Header="Seçileni Yedekle" Command="{Binding BackupSelectedCommand}" />
+                            <Separator />
+                            <MenuItem Header="Etkinleştir" Command="{Binding ToggleDeviceCommand}" CommandParameter="True" />
+                            <MenuItem Header="Devre Dışı Bırak" Command="{Binding ToggleDeviceCommand}" CommandParameter="False" />
+                            <Separator />
+                            <MenuItem Header="Donanımı Yeniden Tara" Command="{Binding RescanHardwareCommand}" />
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                </DataGrid>
+            </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource Card}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Cihaz Detayı" Style="{StaticResource CardTitle}" />
+                        <TextBlock Text="Bir cihaz seçin" Style="{StaticResource EmptyStateText}"
+                                   Visibility="{Binding HasSelection, Converter={StaticResource InverseBool}}" />
+                        <StackPanel Visibility="{Binding HasSelection, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock Text="{Binding SelectedDevice.DeviceName}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,8" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding SelectedDevice.DeviceClass, StringFormat='Sınıf: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding SelectedDevice.Manufacturer, StringFormat='Üretici: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding SelectedDevice.Provider, StringFormat='Sağlayıcı: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding SelectedDevice.DriverVersion, StringFormat='Sürüm: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding SelectedDevice.DriverDate, StringFormat='Tarih: {0:yyyy-MM-dd}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding SelectedDevice.Signer, StringFormat='İmzalayan: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding SelectedDevice.SignatureStatus, StringFormat='İmza durumu: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding SelectedDevice.InfName, StringFormat='INF: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding SelectedDevice.Status, StringFormat='Durum: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding SelectedDevice.ProblemText, StringFormat='Sorun: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricLabel}" Text="Donanım Kimlikleri" Margin="0,8,0,2" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding SelectedDevice.HardwareIdsDisplay}" TextWrapping="Wrap" FontFamily="Consolas" FontSize="11" />
+                            <TextBlock Style="{StaticResource MetricLabel}" Text="Uyumlu Kimlikler" Margin="0,8,0,2" />
+                            <ItemsControl ItemsSource="{Binding SelectedDevice.CompatibleIds}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Style="{StaticResource MetricCaption}" FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Style="{StaticResource MetricCaption}" Margin="0,8,0,0"
+                                       Text="{Binding SelectedDevice.DeviceInstanceId, StringFormat='Instance ID: {0}'}"
+                                       TextWrapping="Wrap" FontSize="10" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="4" Margin="0,10,0,0">
+            <ProgressBar Height="4" Value="{Binding ScanProgress}" Maximum="100"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+            <TextBlock Style="{StaticResource MetricLabel}" VerticalAlignment="Center"
+                       Text="{Binding StatusMessage}" />
+        </Grid>
+    </Grid>
+</UserControl>

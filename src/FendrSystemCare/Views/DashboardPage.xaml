@@ -1,0 +1,400 @@
+<UserControl
+    x:Class="FendrSystemCare.Views.DashboardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vm="clr-namespace:FendrSystemCare.ViewModels"
+    xmlns:ctrl="clr-namespace:FendrSystemCare.Controls"
+    d:DataContext="{d:DesignInstance Type=vm:DashboardViewModel}"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid>
+        <!-- Yükleme iskeleti -->
+        <Border Background="#88000000" CornerRadius="8"
+                Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ui:ProgressRing IsIndeterminate="True" Width="56" Height="56" />
+                <TextBlock Text="Sistem verileri yükleniyor..." Foreground="White"
+                           Margin="0,16,0,0" FontSize="14" HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,0,12,16">
+            <StackPanel Style="{StaticResource FadeInUp}">
+
+                <!-- Başlık -->
+                <Grid Margin="0,8,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Kontrol Paneli" Style="{StaticResource PageTitle}" />
+                        <TextBlock Style="{StaticResource PageSubtitle}"
+                                   Text="{Binding Snapshot.System.WindowsEdition, FallbackValue='Sistem bilgileri yükleniyor...'}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                        <ui:Button Content="{Binding LiveStatus}" Margin="0,0,8,0" Padding="12,6"
+                                   Command="{Binding ToggleLivePauseCommand}"
+                                   Appearance="Secondary" />
+                        <ui:Button Icon="{ui:SymbolIcon ArrowClockwise24}" Content="Yenile"
+                                   Command="{Binding RefreshCommand}" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Özet Kartları -->
+                <ItemsControl ItemsSource="{Binding SummaryCards}"
+                              Visibility="{Binding Layout.ShowSummary, Converter={StaticResource BoolToVisibility}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource HoverCard}" Width="220" Margin="0,0,12,12">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:SymbolIcon Symbol="{Binding Icon}" FontSize="20"
+                                                       Foreground="{Binding Level, Converter={StaticResource HealthLevelToBrush}}" />
+                                        <TextBlock Text="{Binding Title}" Margin="10,0,0,0"
+                                                   Style="{StaticResource CardTitle}" />
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Description}" Style="{StaticResource MetricCaption}" />
+                                    <Grid Margin="0,10,0,0" Width="72" Height="72" HorizontalAlignment="Left">
+                                        <ui:ProgressRing Progress="{Binding Progress}" Width="72" Height="72" />
+                                        <TextBlock Text="{Binding Progress, StringFormat={}{0:0}}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   FontWeight="Bold" FontSize="16" />
+                                    </Grid>
+                                    <TextBlock Text="{Binding StatusText}" Margin="0,8,0,0"
+                                               Style="{StaticResource MetricValue}" FontSize="14" />
+                                    <ui:Button Content="{Binding ActionLabel}" Margin="0,10,0,0"
+                                               Padding="8,4" FontSize="12" HorizontalAlignment="Left"
+                                               Appearance="Secondary" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Sağlık Skoru + Performans -->
+                <Grid Margin="0,0,0,12"
+                      Visibility="{Binding Layout.ShowPerformanceScores, Converter={StaticResource BoolToVisibility}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Style="{StaticResource AccentCard}" Margin="0,0,12,0">
+                        <StackPanel>
+                            <TextBlock Text="Sistem Sağlığı" Foreground="White" FontSize="14" Opacity="0.9" />
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <TextBlock Text="{Binding Snapshot.Health.Score, FallbackValue=--}"
+                                           Foreground="White" FontSize="56" FontWeight="Bold" />
+                                <TextBlock Text="/100" Foreground="White" Opacity="0.8"
+                                           FontSize="20" VerticalAlignment="Bottom" Margin="4,0,0,12" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding Snapshot.Health.Rating}" Foreground="White"
+                                       FontSize="18" FontWeight="SemiBold" />
+                            <ItemsControl ItemsSource="{Binding HealthFindings}" Margin="0,12,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding StringFormat='• {0}'}"
+                                                   Foreground="White" Opacity="0.85" FontSize="12" Margin="0,2" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="Performans Skorları" Style="{StaticResource CardTitle}" />
+                            <UniformGrid Columns="3" Margin="0,8,0,0">
+                                <StackPanel Margin="0,0,8,8">
+                                    <TextBlock Text="İşlemci" Style="{StaticResource MetricLabel}" />
+                                    <TextBlock Text="{Binding Snapshot.Performance.CpuScore, StringFormat={}{0}/100}"
+                                               Style="{StaticResource MetricValue}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,0,8,8">
+                                    <TextBlock Text="Bellek" Style="{StaticResource MetricLabel}" />
+                                    <TextBlock Text="{Binding Snapshot.Performance.MemoryScore, StringFormat={}{0}/100}"
+                                               Style="{StaticResource MetricValue}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,0,8,8">
+                                    <TextBlock Text="Depolama" Style="{StaticResource MetricLabel}" />
+                                    <TextBlock Text="{Binding Snapshot.Performance.StorageScore, StringFormat={}{0}/100}"
+                                               Style="{StaticResource MetricValue}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,0,8,8">
+                                    <TextBlock Text="Grafik" Style="{StaticResource MetricLabel}" />
+                                    <TextBlock Text="{Binding Snapshot.Performance.GraphicsScore, StringFormat={}{0}/100}"
+                                               Style="{StaticResource MetricValue}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,0,8,8">
+                                    <TextBlock Text="Windows" Style="{StaticResource MetricLabel}" />
+                                    <TextBlock Text="{Binding Snapshot.Performance.WindowsScore, StringFormat={}{0}/100}"
+                                               Style="{StaticResource MetricValue}" />
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="Genel" Style="{StaticResource MetricLabel}" />
+                                    <TextBlock Text="{Binding Snapshot.Performance.OverallScore, StringFormat={}{0}/100}"
+                                               Style="{StaticResource MetricValue}" FontWeight="Bold" />
+                                </StackPanel>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Canlı İzleme -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,12"
+                        Visibility="{Binding Layout.ShowCharts, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Canlı İzleme" Style="{StaticResource CardTitle}" />
+                            <Border Style="{StaticResource BadgeSuccess}" Margin="10,0,0,10">
+                                <TextBlock Text="{Binding LiveStatus}" Style="{StaticResource BadgeText}" />
+                            </Border>
+                        </StackPanel>
+                        <UniformGrid Columns="3" Rows="2" Margin="0,8,0,0">
+                            <StackPanel Margin="0,0,12,12">
+                                <TextBlock Text="{Binding CpuPercent, StringFormat='İşlemci · {0:0}%'}" Style="{StaticResource MetricLabel}" />
+                                <ctrl:LiveChartControl Points="{Binding CpuChart}" Height="80" Title="CPU" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,12,12">
+                                <TextBlock Text="{Binding GpuPercent, StringFormat='Ekran Kartı · {0:0}%'}" Style="{StaticResource MetricLabel}" />
+                                <ctrl:LiveChartControl Points="{Binding GpuChart}" Height="80" Title="GPU" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Text="{Binding RamPercent, StringFormat='Bellek · {0:0}%'}" Style="{StaticResource MetricLabel}" />
+                                <ctrl:LiveChartControl Points="{Binding RamChart}" Height="80" Title="RAM" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,12,0">
+                                <TextBlock Text="{Binding DiskPercent, StringFormat='Disk · {0:0}%'}" Style="{StaticResource MetricLabel}" />
+                                <ctrl:LiveChartControl Points="{Binding DiskChart}" Height="80" Title="Disk" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,12,0">
+                                <TextBlock Text="{Binding NetworkText, StringFormat='Ağ · {0}'}" Style="{StaticResource MetricLabel}" />
+                                <ctrl:LiveChartControl Points="{Binding NetChart}" Height="80" Title="Ağ" />
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="{Binding TemperatureText, StringFormat='Sıcaklık · {0}'}" Style="{StaticResource MetricLabel}" />
+                                <ctrl:LiveChartControl Points="{Binding TempChart}" Height="80" Title="Sıcaklık" />
+                            </StackPanel>
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Hızlı Eylemler -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,12"
+                        Visibility="{Binding Layout.ShowQuickActions, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <TextBlock Text="Hızlı Eylemler" Style="{StaticResource CardTitle}" />
+                        <WrapPanel Margin="0,8,0,0">
+                            <ui:Button Content="Sürücü Tara" Icon="{ui:SymbolIcon ArrowSync24}"
+                                       Command="{Binding ScanDriversCommand}" Margin="0,0,8,8" />
+                            <ui:Button Content="Temizlik" Icon="{ui:SymbolIcon Broom24}"
+                                       Command="{Binding GoCleanupCommand}" Margin="0,0,8,8" />
+                            <ui:Button Content="Onarım" Icon="{ui:SymbolIcon WrenchScrewdriver24}"
+                                       Command="{Binding GoRepairCommand}" Margin="0,0,8,8" />
+                            <ui:Button Content="Geri Yükleme" Icon="{ui:SymbolIcon History24}"
+                                       Command="{Binding CreateRestorePointCommand}" Margin="0,0,8,8" />
+                            <ui:Button Content="Güncelleme" Icon="{ui:SymbolIcon ArrowSync24}"
+                                       Command="{Binding CheckUpdatesCommand}" Margin="0,0,8,8" />
+                            <ui:Button Content="Görev Yöneticisi" Icon="{ui:SymbolIcon Desktop24}"
+                                       Command="{Binding OpenTaskManagerCommand}" Margin="0,0,8,8" />
+                            <ui:Button Content="Gezgini Yenile" Icon="{ui:SymbolIcon ArrowClockwise24}"
+                                       Command="{Binding RestartExplorerCommand}" Margin="0,0,8,8" />
+                            <ui:Button Content="Aygıt Yöneticisi" Icon="{ui:SymbolIcon DeveloperBoard24}"
+                                       Command="{Binding OpenDeviceManagerCommand}" Margin="0,0,8,8" />
+                            <ui:Button Content="Hizmetler" Icon="{ui:SymbolIcon Settings24}"
+                                       Command="{Binding OpenServicesCommand}" Margin="0,0,8,8" />
+                            <ui:Button Content="Olay Görüntüleyici" Icon="{ui:SymbolIcon Book24}"
+                                       Command="{Binding OpenEventViewerCommand}" Margin="0,0,8,8" />
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Uyarı Merkezi -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,12"
+                        Visibility="{Binding Layout.ShowAlerts, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <TextBlock Text="Uyarı Merkezi" Style="{StaticResource CardTitle}" />
+                        <ItemsControl ItemsSource="{Binding Alerts}" Margin="0,8,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border CornerRadius="8" Padding="12,8" Margin="0,0,0,6"
+                                            Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="4" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" CornerRadius="2" Margin="0,0,12,0"
+                                                    Background="{Binding Severity, Converter={StaticResource HealthLevelToBrush}}" />
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                                                <TextBlock Text="{Binding Message}" Style="{StaticResource MetricCaption}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Sistem Bilgisi -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,12"
+                        Visibility="{Binding Layout.ShowSystemInfo, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <TextBlock Text="Sistem Bilgisi" Style="{StaticResource CardTitle}" />
+                        <UniformGrid Columns="3" Margin="0,8,0,0">
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.ComputerName, StringFormat='Bilgisayar: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.CurrentUser, StringFormat='Kullanıcı: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.WindowsBuild, StringFormat='Derleme: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.WindowsVersion, StringFormat='Sürüm: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.InstallDate, StringFormat='Kurulum: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.Uptime, StringFormat='Çalışma: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.Architecture, StringFormat='Mimari: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.Language, StringFormat='Dil: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.Timezone, StringFormat='Saat Dilimi: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.BootMode, StringFormat='Önyükleme: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.SecureBoot, StringFormat='Güvenli Önyükleme: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.TpmVersion, StringFormat='TPM: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.BitLockerStatus, StringFormat='BitLocker: {0}'}" Margin="0,4" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.System.ActivationStatus, StringFormat='Etkinleştirme: {0}'}" Margin="0,4" />
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Donanım Detayları -->
+                <Grid Margin="0,0,0,12"
+                      Visibility="{Binding Layout.ShowHardware, Converter={StaticResource BoolToVisibility}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Style="{StaticResource HoverCard}" Margin="0,0,12,0">
+                        <StackPanel>
+                            <TextBlock Text="İşlemci" Style="{StaticResource CardTitle}" />
+                            <TextBlock Text="{Binding Snapshot.Cpu.Name}" Style="{StaticResource MetricValue}" FontSize="14" TextWrapping="Wrap" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding Snapshot.Cpu.Cores, StringFormat='{}{0} çekirdek'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding Snapshot.Cpu.Threads, StringFormat='{}{0} iş parçacığı'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Cpu.CurrentClockGhz, StringFormat='Saat: {0} GHz'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Cpu.Temperature, StringFormat='Sıcaklık: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Cpu.Power, StringFormat='Güç: {0}'}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource HoverCard}" Margin="0,0,12,0">
+                        <StackPanel>
+                            <TextBlock Text="Ekran Kartı" Style="{StaticResource CardTitle}" />
+                            <TextBlock Text="{Binding Snapshot.Gpu.Name}" Style="{StaticResource MetricValue}" FontSize="14" TextWrapping="Wrap" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Gpu.DriverVersion, StringFormat='Sürücü: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Gpu.VramUsage, StringFormat='VRAM: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Gpu.Temperature, StringFormat='Sıcaklık: {0}'}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Style="{StaticResource HoverCard}">
+                        <StackPanel>
+                            <TextBlock Text="Bellek" Style="{StaticResource CardTitle}" />
+                            <TextBlock Style="{StaticResource MetricValue}" FontSize="14"
+                                       Text="{Binding Snapshot.Memory.InstalledGb, StringFormat='{}{0} GB'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding Snapshot.Memory.MemoryType}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding Snapshot.Memory.UsedGb, StringFormat='Kullanılan: {0} GB'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding Snapshot.Memory.AvailableGb, StringFormat='Boş: {0} GB'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}"
+                                       Text="{Binding Snapshot.Memory.SpeedMhz, StringFormat='Hız: {0} MHz'}" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Depolama -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,12"
+                        Visibility="{Binding Layout.ShowStorage, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <TextBlock Text="Depolama" Style="{StaticResource CardTitle}" />
+                        <DataGrid ItemsSource="{Binding Drives}" AutoGenerateColumns="False"
+                                  IsReadOnly="True" HeadersVisibility="Column" GridLinesVisibility="None"
+                                  Background="Transparent" BorderThickness="0" CanUserAddRows="False"
+                                  RowHeight="36" Margin="0,8,0,0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Sürücü" Binding="{Binding DriveLetter}" Width="60" />
+                                <DataGridTextColumn Header="Etiket" Binding="{Binding Label}" Width="*" />
+                                <DataGridTextColumn Header="Model" Binding="{Binding Model}" Width="1.5*" />
+                                <DataGridTextColumn Header="Dosya Sistemi" Binding="{Binding FileSystem}" Width="80" />
+                                <DataGridTextColumn Header="Kapasite" Binding="{Binding CapacityGb, StringFormat={}{0:0} GB}" Width="80" />
+                                <DataGridTextColumn Header="Boş" Binding="{Binding FreeGb, StringFormat={}{0:0} GB}" Width="70" />
+                                <DataGridTextColumn Header="Sağlık" Binding="{Binding Health}" Width="80" />
+                                <DataGridTextColumn Header="Tür" Binding="{Binding MediaType}" Width="60" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Ağ -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,12"
+                        Visibility="{Binding Layout.ShowNetwork, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <TextBlock Text="Ağ" Style="{StaticResource CardTitle}" />
+                        <UniformGrid Columns="3" Margin="0,8,0,0">
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Network.InternetStatus, StringFormat='İnternet: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Network.AdapterName, StringFormat='Bağdaştırıcı: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Network.PublicIp, StringFormat='Genel IP: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Network.LocalIp, StringFormat='Yerel IP: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Network.Gateway, StringFormat='Ağ Geçidi: {0}'}" />
+                            <TextBlock Style="{StaticResource MetricCaption}" Text="{Binding Snapshot.Network.MacAddress, StringFormat='MAC: {0}'}" />
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Son İşlemler -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,12"
+                        Visibility="{Binding Layout.ShowActivity, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <TextBlock Text="Son İşlemler" Style="{StaticResource CardTitle}" />
+                        <DataGrid ItemsSource="{Binding Activities}" AutoGenerateColumns="False"
+                                  IsReadOnly="True" HeadersVisibility="Column" GridLinesVisibility="None"
+                                  Background="Transparent" BorderThickness="0" CanUserAddRows="False"
+                                  RowHeight="32" Margin="0,8,0,0" MaxHeight="240">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Zaman" Binding="{Binding Time, StringFormat=HH:mm:ss}" Width="80" />
+                                <DataGridTextColumn Header="İşlem" Binding="{Binding Operation}" Width="2*" />
+                                <DataGridTextColumn Header="Durum" Binding="{Binding Status}" Width="80" />
+                                <DataGridTextColumn Header="Sonuç" Binding="{Binding Result}" Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Düzen Özelleştirme -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="Dashboard Düzeni" Style="{StaticResource CardTitle}" />
+                        <WrapPanel Margin="0,8,0,0">
+                            <CheckBox Content="Özet" IsChecked="{Binding Layout.ShowSummary}" Margin="0,0,16,8" />
+                            <CheckBox Content="Sistem Bilgisi" IsChecked="{Binding Layout.ShowSystemInfo}" Margin="0,0,16,8" />
+                            <CheckBox Content="Donanım" IsChecked="{Binding Layout.ShowHardware}" Margin="0,0,16,8" />
+                            <CheckBox Content="Depolama" IsChecked="{Binding Layout.ShowStorage}" Margin="0,0,16,8" />
+                            <CheckBox Content="Ağ" IsChecked="{Binding Layout.ShowNetwork}" Margin="0,0,16,8" />
+                            <CheckBox Content="Grafikler" IsChecked="{Binding Layout.ShowCharts}" Margin="0,0,16,8" />
+                            <CheckBox Content="Uyarılar" IsChecked="{Binding Layout.ShowAlerts}" Margin="0,0,16,8" />
+                            <CheckBox Content="Hızlı Eylemler" IsChecked="{Binding Layout.ShowQuickActions}" Margin="0,0,16,8" />
+                            <CheckBox Content="Performans" IsChecked="{Binding Layout.ShowPerformanceScores}" Margin="0,0,16,8" />
+                            <CheckBox Content="Son İşlemler" IsChecked="{Binding Layout.ShowActivity}" Margin="0,0,16,8" />
+                        </WrapPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <ui:Button Content="Düzeni Kaydet" Command="{Binding SaveLayoutCommand}" Margin="0,0,8,0" />
+                            <ui:Button Content="Varsayılana Dön" Appearance="Secondary"
+                                       Command="{Binding ResetLayoutCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

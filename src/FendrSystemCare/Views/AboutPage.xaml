@@ -1,0 +1,43 @@
+<UserControl
+    x:Class="FendrSystemCare.Views.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vm="clr-namespace:FendrSystemCare.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:AboutViewModel}"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Style="{StaticResource FadeInUp}" Margin="4,8,16,16">
+        <Border Style="{StaticResource Card}" MaxWidth="640" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                    <Border Width="64" Height="64" CornerRadius="16" Background="{StaticResource AccentGradientBrush}">
+                        <ui:SymbolIcon Symbol="ShieldCheckmark24" FontSize="34" Foreground="White" />
+                    </Border>
+                    <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding ProductName}" FontSize="24" FontWeight="Bold" />
+                        <TextBlock Text="{Binding Version, StringFormat='Version {0}'}"
+                                   Style="{StaticResource MetricLabel}" />
+                        <TextBlock Text="{Binding Framework}" Style="{StaticResource MetricLabel}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <TextBlock Text="{Binding Description}" TextWrapping="Wrap"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,16" />
+
+                <TextBlock Text="{Binding Copyright}" Style="{StaticResource MetricLabel}" />
+
+                <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                    <ui:Button Content="Documentation" Icon="{ui:SymbolIcon Book24}"
+                               Command="{Binding OpenLinkCommand}"
+                               CommandParameter="https://learn.microsoft.com/windows/" Margin="0,0,10,0" />
+                    <ui:Button Content="Report an issue" Icon="{ui:SymbolIcon Bug24}"
+                               Command="{Binding OpenLinkCommand}"
+                               CommandParameter="https://github.com/" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

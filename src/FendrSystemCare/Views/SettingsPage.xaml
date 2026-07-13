@@ -1,0 +1,92 @@
+<UserControl
+    x:Class="FendrSystemCare.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vm="clr-namespace:FendrSystemCare.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:SettingsViewModel}"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,8,16,16">
+        <StackPanel Style="{StaticResource FadeInUp}" MaxWidth="720" HorizontalAlignment="Left">
+            <TextBlock Text="Settings" Style="{StaticResource PageTitle}" />
+            <TextBlock Text="Personalise the app and configure automation." Style="{StaticResource PageSubtitle}" />
+
+            <!-- Appearance -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="Appearance" Style="{StaticResource CardTitle}" />
+
+                    <Grid Margin="0,4">
+                        <TextBlock Text="Theme" VerticalAlignment="Center" />
+                        <ComboBox Width="200" HorizontalAlignment="Right"
+                                  ItemsSource="{Binding Themes}"
+                                  SelectedItem="{Binding SelectedTheme, Mode=TwoWay}" />
+                    </Grid>
+
+                    <Grid Margin="0,10,0,0">
+                        <TextBlock Text="Accent color" VerticalAlignment="Center" />
+                        <ListBox HorizontalAlignment="Right" ItemsSource="{Binding AccentColors}"
+                                 SelectedItem="{Binding SelectedAccent, Mode=TwoWay}"
+                                 Background="Transparent" BorderThickness="0">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="26" Height="26" CornerRadius="13" Margin="4"
+                                            Background="{Binding}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+
+                    <Grid Margin="0,10,0,0">
+                        <TextBlock Text="Language" VerticalAlignment="Center" />
+                        <ComboBox Width="200" HorizontalAlignment="Right"
+                                  ItemsSource="{Binding Languages}"
+                                  SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Automation -->
+            <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="Automation &amp; safety" Style="{StaticResource CardTitle}" />
+                    <Grid Margin="0,4">
+                        <TextBlock Text="Check for updates automatically" VerticalAlignment="Center" />
+                        <ui:ToggleSwitch HorizontalAlignment="Right" IsChecked="{Binding AutoUpdate}" />
+                    </Grid>
+                    <Grid Margin="0,4">
+                        <TextBlock Text="Run a quick scan on launch" VerticalAlignment="Center" />
+                        <ui:ToggleSwitch HorizontalAlignment="Right" IsChecked="{Binding AutoScan}" />
+                    </Grid>
+                    <Grid Margin="0,4">
+                        <TextBlock Text="Create a restore point before repairs" VerticalAlignment="Center" />
+                        <ui:ToggleSwitch HorizontalAlignment="Right" IsChecked="{Binding CreateRestorePointAutomatically}" />
+                    </Grid>
+                    <Grid Margin="0,4">
+                        <TextBlock Text="Show notifications" VerticalAlignment="Center" />
+                        <ui:ToggleSwitch HorizontalAlignment="Right" IsChecked="{Binding NotificationsEnabled}" />
+                    </Grid>
+                    <Grid Margin="0,4">
+                        <TextBlock Text="Minimize to system tray" VerticalAlignment="Center" />
+                        <ui:ToggleSwitch HorizontalAlignment="Right" IsChecked="{Binding MinimizeToTray}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal">
+                <ui:Button Content="Save settings" Appearance="Primary" Icon="{ui:SymbolIcon Save24}"
+                           Command="{Binding SaveCommand}" Margin="0,0,10,0" />
+                <ui:Button Content="Open logs" Icon="{ui:SymbolIcon Document24}"
+                           Command="{Binding OpenLogsCommand}" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

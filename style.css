@@ -1,0 +1,51 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+    color: #e8e8ed;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+.container { max-width: 520px; width: 100%; text-align: center; }
+.logo { font-size: 48px; margin-bottom: 12px; }
+h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+.subtitle { color: #8e8e93; margin-bottom: 28px; font-size: 14px; }
+.card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+.card h2 { font-size: 18px; margin-bottom: 12px; }
+.card p { color: #aeaeb2; font-size: 14px; margin-bottom: 16px; line-height: 1.5; }
+.ad-links { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.ad-btn {
+    display: block; padding: 14px; border-radius: 10px;
+    background: rgba(10,132,255,0.15); color: #0a84ff;
+    text-decoration: none; font-weight: 600; text-align: center;
+    border: 1px solid rgba(10,132,255,0.3); transition: all 0.2s;
+}
+.ad-btn:hover { background: rgba(10,132,255,0.25); }
+.ad-btn.visited { background: rgba(48,209,88,0.15); color: #30d158; border-color: rgba(48,209,88,0.3); }
+.timer { text-align: center; font-size: 15px; margin-bottom: 16px; color: #ff9f0a; }
+.primary {
+    width: 100%; padding: 14px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, #0a84ff, #5e5ce6);
+    color: white; font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.primary:not(:disabled):hover { filter: brightness(1.1); }
+.key-box {
+    background: rgba(0,0,0,0.3); border-radius: 10px; padding: 16px;
+    font-family: 'Cascadia Code', monospace; font-size: 18px;
+    text-align: center; letter-spacing: 1px; margin-bottom: 16px;
+    color: #30d158; word-break: break-all;
+}
+.hint { font-size: 12px; color: #8e8e93; text-align: center; margin-top: 12px; }
+.hidden { display: none; }
+footer { margin-top: 24px; font-size: 12px; color: #636366; }
